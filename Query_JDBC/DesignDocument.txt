@@ -1,0 +1,95 @@
+--------------------------------------------------------------------------------------------------------------------
+
+Author : Siddharth Nahar
+Entry No. : 2016csb1043
+Use : Getting a idea for Using java to connect to database
+      and Performing Queries
+Date : 9/4/18
+
+--------------------------------------------------------------------------------------------------------------------
+
+Design of Schema : 
+
+ * Created as Stated in pdf.
+ * Some Aditions are mentioned in Schema.sql
+ 
+ --------------------------------------------------------------------------------------
+ 
+ * Getting Connection Object :
+        
+        -- SEVER_URL,USERNAME,PASSWORD are taken as Input
+        -- Password Input will not echo back any value
+        
+        Connection conn = DriverManager.getConnection(Server_URL,UserName,PassWord);
+        
+ --------------------------------------------------------------------------------------
+ 
+ * For Random Info :
+ 
+        -- Created Info.properties file containg some info 
+        -- Used that Info in Random way
+        -- Date is Chosen Randomly under some Constratints
+        -- Reading From Properties File as Map
+        
+        long dob = (long)(rand.nextDouble()*(maxDate-minDate+1) + minDate);
+        long DateOpen = (long)(rand.nextDouble()*(maxOpen-minOpen+1)+minOpen);
+        int First_Index = rand.nextInt(FirstNames.length-2);
+        int Last_Index  = rand.nextInt(LastNames.length-2);
+        int Email_Index  = rand.nextInt(Emails.length-2);
+        
+ ----------------------------------------------------------------------------------------
+ 
+ * Inserting into Contacts :
+ 
+        String sql = "Insert Into Contact_Info(Contact_ID,Street_Address,City,State,Country,Postal_Code,Mobile) Values('"+Contact_id+"','"+StreetAddress+"','"+City_1+"','"+State+"','India','"+PostalCode+"','"+Mobile+"')";
+        
+ ------------------------------------------------------------------------------------------
+ 
+ * Inserting into Persons and Bank Account
+ 
+        String sql = "Insert Into Account_Holder(Person_ID,PAN_ID,First_Name,Last_Name,DOB,Contact_ID) values('"+Person_id+"','"+Pan+"','"+first_name+"','"+last_name+"','"+obj+"','"+Person_id+"')";
+                                
+        String sql3 = "Update Contact_Info Set Email = '"+Email+"' Where Contact_ID = '"+Person_id+"'";
+                                
+        /*Sql Query for Bank Account insert random balance*/
+        String sql2 = "Insert Into Bank_Account(Account_ID,Date_Open,Status,Person_ID,Account_Type,Current_Balance,LastTransaction) values('"+Person_id+"','"+GetTime+"','Active','"+Person_id+"','Savings','"+balance+"','"+GetTime+"')";
+        
+ -------------------------------------------------------------------------------------------------------------------------------
+ 
+ * Updating Transactions : 
+ 
+        /*Insert into Account Transaction Amount of transfer and Category and Accoutn ID*/
+        String sql1 = "Insert Into Account_Transaction(Transaction_Type,Transaction_Time,Amount,Balance_Remaining,Account_ID,Category) values ('Debit','"+GetTime+"','"+Amt+"','"+FinalBalanceSender+"','"+i+"','"+category+"')";
+        
+        /*Insert Same Amount as Credit for other Account*/
+        String sql2 = "Insert Into Account_Transaction(Transaction_Type,Transaction_Time,Amount,Balance_Remaining,Account_ID,Category) values ('Credit','"+GetTime+"','"+Amt+"','"+FinalBalanceRecev+"','"+Account_No+"','"+category+"')";
+                                                 
+                                                
+                                                
+        /*Update the Last Transaction Dates of Account and thier Balanace*/
+        String sql3 = "Update Bank_Account Set Current_Balance = '"+FinalBalanceSender+"' Where Account_ID = '"+i+"'";
+        String sql4 = "Update Bank_Account Set Current_Balance = '"+FinalBalanceRecev+"' Where Account_ID = '"+Account_No+"'";         
+        
+        /*Update Last Update of Account*/
+        String sql5 = "Update Bank_Account Set LastTransaction = '"+GetTime+"' where Account_ID = '"+i+"' and LastTransaction < '"+GetTime+"'";
+        String sql6 = "Update Bank_Account Set LastTransaction = '"+GetTime+"' where Account_ID = '"+Account_No+"' and LastTransaction < '"+GetTime+"'";
+        
+ ------------------------------------------------------------------------------------------------------------------------------
+ 
+ * Querying Transaction Statement : 
+ 
+        String sql = "select Account_ID,First_Name,Last_Name,Transaction_Type,Category,Balance_Remaining,Amount,Transaction_Time,PAN_ID from (Bank_Account join Account_Holder using(Person_ID)) join Account_Transaction using(Account_ID) where Account_ID = '"+Account_ID+"' and Transaction_Time >= '"+Start+"' and Transaction_Time <= '"+Last+"' order by Transaction_Time";
+        
+        * As Transaction Times are Random,So Output cannot be justifed(Ignore Transaction Time);
+ ---------------------------------------------------------------------------------------------------------------------------------
+ 
+ * Querying Other two Queries : 
+ 
+        String sql2 = "select Category,sum(Amount) from Bank_Account join Account_Transaction using(Account_ID) where Account_ID = '"+Integer.toString(Account_ID)+"' and Transaction_Type = 'Debit' and monthname(Transaction_Time) like '%"+Month+"%' group by Category";
+   
+        String sql = "select Category,sum(Amount) from (Account_Holder join Contact_Info using(Contact_ID)) join (Bank_Account join Account_Transaction using(Account_ID)) using(Person_ID) where Transaction_Type = 'Debit' and monthname(Transaction_Time) like '%"+Month+"%' and City like '%"+City+"%' group by Category";                      
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+-- One Discrepency As Transaction Time was Chosen Randomly So,Remaining Balance is not getting Printed or Time doesnt match
+-- Please Ignore Transaction Time for 1st Query 

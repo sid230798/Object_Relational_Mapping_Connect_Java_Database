@@ -1,0 +1,67 @@
+----------------------------------------------------------------------------------
+
+Author : Siddharth Nahar
+Entry No : 2016csb1043
+Use : Basic Connections and Extraction of Meta Data from Database
+Date : 18/3/18
+
+----------------------------------------------------------------------------------
+
+Design Principles : 
+
+*Registration of Driver to be Used and Getting Connection :
+
+Rgistration : DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+
+ -- com.mysql.jdbc.Driver is Class in Directory structure in jar file include
+ 
+*Getting Connection :
+
+GetConnection Obj :  Connection conn = DriverManager.getConnection(Server_URL,UserName,PassWord);
+
+ -- Password is inputed using Console class so it will be secret
+
+*Password Input :
+  
+    Console con = System.console();
+    char arr[] = con.readPassword();
+             
+ -- Nothing will be echoed back
+ 
+----------------------------------------------------------------------------------------------------------------------
+
+*Getting Table name for Database and Looping through each table 
+
+    DatabaseMetaData MetaData = conn.getMetaData();
+    ResultSet Tables = MetaData.getTables(null, null, "%", "Table");
+    
+    --ResultSet getTables(String catalog,
+                  String schemaPattern,
+                  String tableNamePattern,
+                  String[] types)
+                    throws SQLException
+                    
+    --catalog - a catalog name; must match the catalog name as it is stored in the database; "" retrieves those without a catalog; null means that the catalog name should not be used to narrow the search
+    --schemaPattern - a schema name pattern; must match the schema name as it is stored in the database; "" retrieves those without a schema; null means that the schema name should not be used to narrow the search
+    --tableNamePattern - a table name pattern; must match the table name as it is stored in the database
+    --types - a list of table types, which must be from the list of table types returned from getTableTypes(),to include; null returns all types
+    
+------------------------------------------------------------------------------------------------------------------------
+
+*Get Column name and IndexInfo for Table by extracting Table name
+
+    ResultSet Columns = MetaData.getColumns(null,null,Tables.getString(3),null);
+    ResultSet Index = MetaData.getIndexInfo(null,null,Tables.getString(3),false,false);
+    
+   -- ResultSet getColumns(String catalog,
+                   String schemaPattern,
+                   String tableNamePattern,
+                   String columnNamePattern)
+                     throws SQLException
+                     
+   --catalog - a catalog name; must match the catalog name as it is stored in the database; "" retrieves those without a catalog; null means that the catalog name should not be used to narrow the search
+   --schemaPattern - a schema name pattern; must match the schema name as it is stored in the database; "" retrieves those without a schema; null means that the schema name should not be used to narrow the search
+   --tableNamePattern - a table name pattern; must match the table name as it is stored in the database
+   --columnNamePattern - a column name pattern; must match the column name as it is stored in the database
+   
+----------------------------------------------------------------------------------------------------------------------------                 

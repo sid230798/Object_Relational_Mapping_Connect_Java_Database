@@ -1,0 +1,107 @@
+-----------------------------------------------------------------------
+
+Author : Siddharth Nahar
+Entry No : 2016csb1043
+Use : Used JPA library for Creating Schema and Executing Queries through Java
+Date : 21/4/18
+
+-------------------------------------------------------------------------
+
+Design : 
+
+Classes That Create Entities in Tables : 
+
+ -- Created POJO Classes for Table Representation
+
+Person : 
+
+@Entity
+@Table
+public class Person{
+
+        /*Creating a Primary Key*/
+        @Id
+        @GeneratedValue(strategy = GenerationType.AUTO)
+        
+        private int PersonID;
+        private String First_Name;
+        private String Last_Name;
+        private java.sql.Date DateOfBirth;
+
+        /*Creating Foreign key for ContactInfo*/
+        @ManyToOne(cascade=CascadeType.PERSIST)
+        private ContactInfo ContactID;
+        
+}
+
+ -- Use of Annotations for Field Representation
+ -- Auto Increment ,Foriegn key annotation
+ 
+----------------------------------------------------------------------------------
+
+Insertion through JPA Libraries and Schema Build :
+
+
+  EntityManagerFactory emfactory = Persistence.createEntityManagerFactory( "Eclipselink_JPA" ); 
+
+  -- Creates Schema by Persistence file Mapping
+  
+  -- Random Data is being built by Info.properties file
+  -- Team Names are Randomly Generated of 3-4 letters
+  -- States,Cities,Address are taken from Info.Properties file
+  -- All Other categories are genrated randomly
+  
+  
+                long min = 10000L;
+                long max = 1000000L;
+                double Salary = rand.nextDouble()*(max-min+1)+min;
+                
+                long minOpen =1026546232642L;
+                java.util.Date now = new java.util.Date();  
+                long maxOpen = now.getTime();        
+        
+                long time = (long)(rand.nextDouble()*(maxOpen-minOpen+1) + minOpen);
+                
+                java.sql.Date HireDate = new java.sql.Date(time);
+                 int  TeamMemberID =  Math.abs(rand.nextInt());
+
+  -- For Transaction begina and commit : 
+  
+        EntityManager entitymanager = emfactory.createEntityManager( );
+        entitymanager.getTransaction( ).begin( );
+        entitymanager.persist(DummyTeam);
+        entitymanager.getTransaction( ).commit( );
+        
+------------------------------------------------------------------------------------
+
+Queries are as Follows :
+
+* For TeamMembers as Players and Salaries : 
+
+        -- Salaries are from 10000 to 1000000
+
+        Query query = entitymanager.createQuery("SELECT p,tm FROM TeamMember tm , Person p , Team t WHERE tm.PersonID.PersonID = p.PersonID AND tm.TeamID.TeamID = t.TeamID AND tm.role = Role.Player AND t.Name = :Name AND tm.Salary > :low AND tm.Salary < :high");
+        
+        -- Setting Parameters by name
+        
+        Iterate through ResultList : 
+        
+         List<Object[]> list = (List<Object[]>)query.getResultList();
+         for(Object[] arr:list){
+          
+         }
+         
+* For Role Wise Memebres of Team : 
+
+        Query query = entitymanager.createQuery("SELECT p,tm FROM TeamMember tm , Person p , Team t WHERE tm.PersonID.PersonID = p.PersonID AND tm.TeamID.TeamID = t.TeamID AND t.Name = :Name ORDER BY tm.MemberID");
+        
+        
+* For Avg Salary by State : 
+
+        Query query = entitymanager.createQuery("SELECT AVG(tm.Salary) FROM TeamMember tm, Person p, ContactInfo c WHERE tm.PersonID.PersonID = p.PersonID AND p.ContactID.ContactID = c.ContactID AND tm.role = Role.Player AND c.State = :State GROUP BY c.State");
+        
+        -- We require only Single Result So :
+        
+         double Avg_Salary = (double)query.getSingleResult();
+         
+-------------------------------------------------------------------------------------------
